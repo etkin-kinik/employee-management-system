@@ -1,7 +1,7 @@
 package com.venhancer.employee.management.system.Enumeration;
 
 
-public enum Role {
+public enum Roles {
     ADMIN,
     MANAGER,
     EMPLOYEE
