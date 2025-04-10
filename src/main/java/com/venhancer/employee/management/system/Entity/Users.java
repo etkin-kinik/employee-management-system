@@ -8,6 +8,9 @@ import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -28,7 +31,18 @@ public class Users {
 
     private String username;
     private String password;
+    private String name;
+    private String surname;
+    private Long departmentId;
 
     @Enumerated(EnumType.STRING)
-    Roles Role;
+    private Roles role;
+
+    @ManyToOne
+    @JoinColumn(name = "employee_id")
+    private Employee employee;
+
+    @OneToOne
+    @JoinColumn(name = "manager_id")
+    private Manager manager;
 }

@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 
 import com.venhancer.employee.management.system.DTO.EmployeeDTO;
@@ -34,7 +35,7 @@ public class EmployeeService {
     @Autowired
     ManagerRepository managerRepository;
 
-
+    @PreAuthorize("hasAuthority('ROLE_ADMIN')")
     public EmployeeDTO createEmployee(EmployeeDTO employeeDTO){
         Employee employee = EmployeeMapper.INSTANCE.mapToEmployee(employeeDTO);
 
@@ -67,22 +68,26 @@ public class EmployeeService {
         return EmployeeMapper.INSTANCE.mapToEmployeeDTO(savedEmployee);
     }
 
+    @PreAuthorize("hasAuthority('ROLE_ADMIN') or hasAuthority('ROLE_MANAGER')")
     public EmployeeDTO getEmployeeById(Long id){
         Employee employee = employeeRepository.findById(id)
                     .orElseThrow(() -> new ResourceNotFoundException("Employee is not found according to given ID"));
         return EmployeeMapper.INSTANCE.mapToEmployeeDTO(employee);
     }
 
+    @PreAuthorize("hasAuthority('ROLE_ADMIN')")
     public List<EmployeeDTO> getAllEmployees(){
         List<Employee> employees = employeeRepository.findAll();
         return employees.stream().map((item) -> EmployeeMapper.INSTANCE.mapToEmployeeDTO(item)).collect(Collectors.toList());
     }
 
+    @PreAuthorize("hasAuthority('ROLE_ADMIN') or hasAuthority('ROLE_MANAGER')")
     public List<EmployeeDTO> getEmployeesByDepartmentName(String departmentName){
         List<Employee> employees = employeeRepository.findByDepartmentName(departmentName);
         return employees.stream().map((item) -> EmployeeMapper.INSTANCE.mapToEmployeeDTO(item)).collect(Collectors.toList());
     }
 
+    @PreAuthorize("hasAuthority('ROLE_ADMIN')")
     public EmployeeDTO updateEmployeesDepartment(Long id, EmployeeDTO employeeDTO){
         Employee employee = employeeRepository.findById(id)
                     .orElseThrow(() -> new ResourceNotFoundException("Employee is not found according to given ID"));
@@ -96,6 +101,7 @@ public class EmployeeService {
         return EmployeeMapper.INSTANCE.mapToEmployeeDTO(employee);
     }
 
+    @PreAuthorize("hasAuthority('ROLE_ADMIN')")
     public void deleteEmployee(Long id){
         Employee employee = employeeRepository.findById(id)
                     .orElseThrow(() -> new ResourceNotFoundException("Employee is not found according to given ID"));

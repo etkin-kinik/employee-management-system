@@ -1,6 +1,5 @@
 package com.venhancer.employee.management.system.Service;
 
-import java.security.Key;
 import java.security.NoSuchAlgorithmException;
 import java.util.Base64;
 import java.util.Date;
@@ -11,8 +10,13 @@ import java.util.function.Function;
 import javax.crypto.KeyGenerator;
 import javax.crypto.SecretKey;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
+
+import com.venhancer.employee.management.system.Entity.Users;
+import com.venhancer.employee.management.system.Enumeration.Roles;
+import com.venhancer.employee.management.system.Repository.UsersRepository;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
@@ -24,6 +28,9 @@ public class JWTService {
 
     private String secretKey = "";
 
+    @Autowired
+    UsersRepository usersRepository;
+
     public JWTService(){
         try {
             KeyGenerator keyGenerator = KeyGenerator.getInstance("HmacSHA256");
@@ -34,14 +41,18 @@ public class JWTService {
         }
     }
 
-    public String generateToken(String username) {
+    public String generateToken(Users user) {
 
         Map<String, Object> claims = new HashMap<>();
+
+        Roles role = usersRepository.findByUsername(user.getUsername()).getRole();
+
+        claims.put("roles", "ROLE_" + role.name());
 
         return Jwts.builder()
                 .claims()
                 .add(claims)
-                .subject(username)
+                .subject(user.getUsername())
                 .issuedAt(new Date(System.currentTimeMillis()))
                 .expiration(new Date(System.currentTimeMillis() + 60 * 60 * 30))
                 .and()

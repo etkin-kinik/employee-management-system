@@ -1,10 +1,13 @@
 package com.venhancer.employee.management.system.Controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.venhancer.employee.management.system.DTO.UsersDTO;
 import com.venhancer.employee.management.system.Entity.Users;
 import com.venhancer.employee.management.system.Service.UsersService;
 
@@ -16,8 +19,9 @@ public class UsersController {
     private UsersService usersService;
 
     @PostMapping("/register")
-    public Users registerUser(@RequestBody Users users){
-        return usersService.registerUser(users);
+    public ResponseEntity<UsersDTO> registerUser(@RequestBody UsersDTO usersdDto){
+        UsersDTO users = usersService.registerUser(usersdDto);
+        return new ResponseEntity<>(users, HttpStatus.CREATED);
     }
 
     @PostMapping("/login")

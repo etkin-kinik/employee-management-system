@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 
 import com.venhancer.employee.management.system.DTO.ManagerDTO;
@@ -29,6 +30,7 @@ public class ManagerService {
     @Autowired
     ManagerRepository managerRepository;
 
+    @PreAuthorize("hasAuthority('ROLE_ADMIN')")
     public ManagerDTO createManager(ManagerDTO managerDTO) {
         Manager manager = ManagerMapper.INSTANCE.mapToManager(managerDTO);
 
@@ -55,22 +57,26 @@ public class ManagerService {
         return ManagerMapper.INSTANCE.mapToManagerDTO(savedManager);
     }
 
+    @PreAuthorize("hasAuthority('ROLE_ADMIN') or hasAuthority('ROLE_MANAGER')")
     public ManagerDTO getManagerById(Long id){
         Manager manager = managerRepository.findById(id)
                     .orElseThrow(() -> new ResourceNotFoundException("Manager is not found according to given ID"));
         return ManagerMapper.INSTANCE.mapToManagerDTO(manager);
     }
 
+    @PreAuthorize("hasAuthority('ROLE_ADMIN')")
     public List<ManagerDTO> getAllManagers(){
         List<Manager> allManagers = managerRepository.findAll();
         return allManagers.stream().map((item) -> ManagerMapper.INSTANCE.mapToManagerDTO(item)).collect(Collectors.toList());
     }
 
+    @PreAuthorize("hasAuthority('ROLE_ADMIN') or hasAuthority('ROLE_MANAGER')")
     public ManagerDTO getManagerByDepartmentName(String departmentName){
         Manager manager = managerRepository.findByDepartmentName(departmentName);
         return ManagerMapper.INSTANCE.mapToManagerDTO(manager);
     }
     
+    @PreAuthorize("hasAuthority('ROLE_ADMIN')")
     public ManagerDTO updateManagerDepartment(Long id, ManagerDTO managerDTO){
         Manager manager = managerRepository.findById(id)
                     .orElseThrow(() -> new ResourceNotFoundException("Manager is not found according to given ID"));
@@ -122,6 +128,7 @@ public class ManagerService {
         return ManagerMapper.INSTANCE.mapToManagerDTO(manager);
     }
 
+    @PreAuthorize("hasAuthority('ROLE_ADMIN')")
     public void deleteManager(Long id){
         Manager manager = managerRepository.findById(id)
                     .orElseThrow(() -> new ResourceNotFoundException("Manager is not found according to given ID"));

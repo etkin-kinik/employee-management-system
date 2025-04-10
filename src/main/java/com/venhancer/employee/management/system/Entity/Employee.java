@@ -41,4 +41,7 @@ public class Employee {
     @JoinColumn(name = "manager_id")
     private Manager manager;
 
+    @OneToOne(mappedBy = "employee")
+    private Users users;
+
 }

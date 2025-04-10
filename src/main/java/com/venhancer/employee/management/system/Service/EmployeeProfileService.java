@@ -1,6 +1,7 @@
 package com.venhancer.employee.management.system.Service;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 
 import com.venhancer.employee.management.system.DTO.EmployeeProfileDTO;
@@ -20,7 +21,7 @@ public class EmployeeProfileService {
     @Autowired
     EmployeeProfileRepository employeeProfileRepository;
 
-
+    @PreAuthorize("hasAuthority('ROLE_EMPLOYEE')")
     public EmployeeProfileDTO updateEmployeeProfileDTO(Long id, EmployeeProfileDTO employeeProfileDTO){
         Employee employee = employeeRepository.findById(id)
                     .orElseThrow(() -> new ResourceNotFoundException("Employee is not found according to given ID"));
@@ -46,6 +47,7 @@ public class EmployeeProfileService {
         return EmployeeProfileMapper.INSTANCE.mapToEmployeeProfileDTO(savedEmployeeProfile);
     }
 
+    @PreAuthorize("hasAuthority('ROLE_ADMIN') or hasAuthority('ROLE_MANAGER') or hasAuthority('ROLE_EMPLOYEE')")
     public EmployeeProfileDTO getEmployeeProfileById(Long id){
         EmployeeProfile employeeProfile = employeeProfileRepository.findById(id)
                     .orElseThrow(() -> new ResourceNotFoundException("Employee's profile is not found according to given ID"));

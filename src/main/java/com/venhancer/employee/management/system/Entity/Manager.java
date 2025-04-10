@@ -10,6 +10,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
+import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -38,4 +39,6 @@ public class Manager {
     @OneToMany(mappedBy = "manager", cascade = CascadeType.PERSIST)
     private List<Employee> employee;
 
+    @OneToOne(mappedBy = "manager")
+    private Users users;
 }

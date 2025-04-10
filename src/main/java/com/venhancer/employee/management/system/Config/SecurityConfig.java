@@ -11,19 +11,19 @@ import org.springframework.security.config.annotation.authentication.configurati
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
-import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 import com.venhancer.employee.management.system.Filter.JwtFilter;
+import com.venhancer.employee.management.system.Service.MyUserDetailsService;
 
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig {
 
     @Autowired
-    UserDetailsService userDetailsService;
+    MyUserDetailsService myUserDetailsService;
     
     @Autowired
     private JwtFilter jwtFilter;
@@ -33,8 +33,22 @@ public class SecurityConfig {
 
         return httpSecurity.csrf(customizer -> customizer.disable())
                         .authorizeHttpRequests(request -> request
-                            .requestMatchers("register", "login")
-                            .permitAll()
+                            .requestMatchers("/api/ems/employee/profile/update").hasAuthority("ROLE_EMPLOYEE")
+                            .requestMatchers("/api/ems/department/create", 
+                                                         "/api/ems/department/delete",
+                                                         "/api/ems/employee/create",
+                                                         "/api/ems/employee/all",
+                                                         "/api/ems/employee/department-update",
+                                                         "/api/ems/employee/delete",
+                                                         "/api/ems/manager/create",
+                                                         "/api/ems/manager/all",
+                                                         "/api/ems/manager/department-update",
+                                                         "/api/ems/manager/delete").hasAuthority("ROLE_ADMIN")
+                            .requestMatchers("/api/ems/manager/**").hasAnyAuthority("ROLE_ADMIN", "ROLE_MANAGER")
+                            .requestMatchers("/api/ems/employee/profile/**").hasAnyAuthority("ROLE_EMPLOYEE", "ROLE_ADMIN", "ROLE_MANAGER")
+                            .requestMatchers("/api/ems/employee/**").hasAnyAuthority("ROLE_ADMIN", "ROLE_MANAGER")
+                            .requestMatchers("/api/ems/department/**").hasAnyAuthority("ROLE_ADMIN", "ROLE_MANAGER")
+                            .requestMatchers("register", "login").permitAll()
                             .anyRequest().authenticated())
                         .httpBasic(Customizer.withDefaults())
                         .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
@@ -46,7 +60,7 @@ public class SecurityConfig {
     public AuthenticationProvider authenticationProvider(){
         DaoAuthenticationProvider provider = new DaoAuthenticationProvider();
         provider.setPasswordEncoder(new BCryptPasswordEncoder(12));
-        provider.setUserDetailsService(userDetailsService);
+        provider.setUserDetailsService(myUserDetailsService);
         return provider;
     }
     
