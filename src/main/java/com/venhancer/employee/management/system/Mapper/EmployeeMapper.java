@@ -20,5 +20,6 @@ public interface EmployeeMapper {
     @Mapping(target = "department.id", source = "departmentId")
     @Mapping(target = "employeeProfile.id", source = "employeeProfileId")
     @Mapping(target = "manager.id", source = "managerId")
+    @Mapping(target = "users", ignore = true)
     Employee mapToEmployee(EmployeeDTO employeeDTO);
 }

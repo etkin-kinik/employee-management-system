@@ -5,7 +5,6 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 
 import com.venhancer.employee.management.system.DTO.EmployeeDTO;
@@ -13,12 +12,14 @@ import com.venhancer.employee.management.system.Entity.Department;
 import com.venhancer.employee.management.system.Entity.Employee;
 import com.venhancer.employee.management.system.Entity.EmployeeProfile;
 import com.venhancer.employee.management.system.Entity.Manager;
+import com.venhancer.employee.management.system.Entity.Users;
 import com.venhancer.employee.management.system.Exception.ResourceNotFoundException;
 import com.venhancer.employee.management.system.Mapper.EmployeeMapper;
 import com.venhancer.employee.management.system.Repository.DepartmentRepository;
 import com.venhancer.employee.management.system.Repository.EmployeeProfileRepository;
 import com.venhancer.employee.management.system.Repository.EmployeeRepository;
 import com.venhancer.employee.management.system.Repository.ManagerRepository;
+import com.venhancer.employee.management.system.Repository.UsersRepository;
 
 @Service
 public class EmployeeService {
@@ -35,7 +36,9 @@ public class EmployeeService {
     @Autowired
     ManagerRepository managerRepository;
 
-    @PreAuthorize("hasAuthority('ROLE_ADMIN')")
+    @Autowired
+    UsersRepository usersRepository;
+
     public EmployeeDTO createEmployee(EmployeeDTO employeeDTO){
         Employee employee = EmployeeMapper.INSTANCE.mapToEmployee(employeeDTO);
 
@@ -68,26 +71,22 @@ public class EmployeeService {
         return EmployeeMapper.INSTANCE.mapToEmployeeDTO(savedEmployee);
     }
 
-    @PreAuthorize("hasAuthority('ROLE_ADMIN') or hasAuthority('ROLE_MANAGER')")
     public EmployeeDTO getEmployeeById(Long id){
         Employee employee = employeeRepository.findById(id)
                     .orElseThrow(() -> new ResourceNotFoundException("Employee is not found according to given ID"));
         return EmployeeMapper.INSTANCE.mapToEmployeeDTO(employee);
     }
 
-    @PreAuthorize("hasAuthority('ROLE_ADMIN')")
     public List<EmployeeDTO> getAllEmployees(){
         List<Employee> employees = employeeRepository.findAll();
         return employees.stream().map((item) -> EmployeeMapper.INSTANCE.mapToEmployeeDTO(item)).collect(Collectors.toList());
     }
 
-    @PreAuthorize("hasAuthority('ROLE_ADMIN') or hasAuthority('ROLE_MANAGER')")
     public List<EmployeeDTO> getEmployeesByDepartmentName(String departmentName){
         List<Employee> employees = employeeRepository.findByDepartmentName(departmentName);
         return employees.stream().map((item) -> EmployeeMapper.INSTANCE.mapToEmployeeDTO(item)).collect(Collectors.toList());
     }
 
-    @PreAuthorize("hasAuthority('ROLE_ADMIN')")
     public EmployeeDTO updateEmployeesDepartment(Long id, EmployeeDTO employeeDTO){
         Employee employee = employeeRepository.findById(id)
                     .orElseThrow(() -> new ResourceNotFoundException("Employee is not found according to given ID"));
@@ -101,24 +100,29 @@ public class EmployeeService {
         return EmployeeMapper.INSTANCE.mapToEmployeeDTO(employee);
     }
 
-    @PreAuthorize("hasAuthority('ROLE_ADMIN')")
     public void deleteEmployee(Long id){
         Employee employee = employeeRepository.findById(id)
                     .orElseThrow(() -> new ResourceNotFoundException("Employee is not found according to given ID"));
 
-        EmployeeProfile employeeProfile = employeeProfileRepository.findById(employee.getEmployeeProfile().getId())
-                    .orElseThrow(() -> new ResourceNotFoundException("Employee profile is not found according to given ID"));
+        EmployeeProfile employeeProfile = employee.getEmployeeProfile();
 
-        if(employeeProfile.getEmployeeId() != null && employee.getEmployeeProfile() != null){
+        if(employeeProfile != null){
             employee.setEmployeeProfile(null);
-            employeeProfile.setEmployeeId(null);
+            employeeProfile.setEmployee(null);
 
             employeeRepository.save(employee);
             employeeProfileRepository.save(employeeProfile);
             
-            employeeProfileRepository.deleteById(employeeProfile.getId());
+            employeeProfileRepository.delete(employeeProfile);
         }
-        employeeRepository.deleteById(id);
+
+        Users user = employee.getUsers();
+        if(user != null){
+            employee.setUsers(null);
+            usersRepository.delete(user);
+        }
+        
+        employeeRepository.delete(employee);
     }
 
 }

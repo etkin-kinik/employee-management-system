@@ -4,7 +4,6 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 
 import com.venhancer.employee.management.system.DTO.DepartmentDTO;
@@ -30,7 +29,6 @@ public class DepartmentService {
     @Autowired
     ManagerRepository managerRepository;
 
-    @PreAuthorize("hasAuthority('ROLE_ADMIN')")
     public DepartmentDTO createDepartment(DepartmentDTO departmentDTO){
         Department department = DepartmentMapper.INSTANCE.mapToDepartment(departmentDTO);
 
@@ -46,26 +44,22 @@ public class DepartmentService {
         return DepartmentMapper.INSTANCE.mapToDepartmentDTO(savedDepartment);
     }
 
-    @PreAuthorize("hasAuthority('ROLE_ADMIN') or hasAuthority('ROLE_MANAGER')")
     public List<DepartmentDTO> getAllDepartments(){
         List<Department> allDepartments = departmentRepository.findAll();
         return allDepartments.stream().map((item) -> DepartmentMapper.INSTANCE.mapToDepartmentDTO(item)).collect(Collectors.toList());
     }
 
-    @PreAuthorize("hasAuthority('ROLE_ADMIN') or hasAuthority('ROLE_MANAGER')")
     public DepartmentDTO getDepartmentById(Long id){
         Department department = departmentRepository.findById(id)
                     .orElseThrow(() -> new ResourceNotFoundException("Department is not found according to given ID"));
         return DepartmentMapper.INSTANCE.mapToDepartmentDTO(department);
     }
 
-    @PreAuthorize("hasAuthority('ROLE_ADMIN') or hasAuthority('ROLE_MANAGER')")
     public DepartmentDTO getDepartmentByDepartmentName(String departmentName){
         Department department = departmentRepository.findDepartmentByDepartmentName(departmentName);
         return DepartmentMapper.INSTANCE.mapToDepartmentDTO(department);
     }
 
-    @PreAuthorize("hasAuthority('ROLE_ADMIN')")
     public void deleteDepartment(Long id){
         Department department = departmentRepository.findById(id)
                     .orElseThrow(() -> new ResourceNotFoundException("Department is not found according to given ID"));

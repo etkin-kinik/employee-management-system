@@ -18,5 +18,6 @@ public interface ManagerMapper {
 
     @Mapping(target = "department.id", source = "departmentId")
     @Mapping(target = "employee", source = "employees")
+    @Mapping(target = "users", ignore = true)
     Manager mapToManager(ManagerDTO managerDTO);
 }

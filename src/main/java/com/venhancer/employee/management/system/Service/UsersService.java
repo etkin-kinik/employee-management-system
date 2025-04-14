@@ -49,6 +49,10 @@ public class UsersService {
         Users users = UsersMapper.INSTANCE.mapToUsers(usersDto);
         users.setPassword(encoder.encode(users.getPassword()));
 
+        if(usersRepository.findByUsername(users.getUsername()) != null){
+            throw new RuntimeException("Username is already exist.");
+        }
+
         if(usersDto.getEmployeeId() != null && usersDto.getRole().name().equals("EMPLOYEE")){
             Employee employee = employeeRepository.findById(usersDto.getEmployeeId())
                         .orElseThrow(() -> new RuntimeException("Employee is not found according to given id"));
@@ -98,11 +102,19 @@ public class UsersService {
             users.setManager(newManager);
         }
 
+        if(usersDto.getRole().name().equals("ADMIN")){
+            users.setName(usersDto.getName());
+            users.setSurname(usersDto.getSurname());
+            users.setEmployee(null);
+            users.setManager(null);
+        }
+
         Users savedUsers = usersRepository.save(users);
         return UsersMapper.INSTANCE.mapToUsersDTO(savedUsers);
     }
 
-    public String verify(Users users) {
+    public String verify(UsersDTO usersDTO) {
+        Users users = UsersMapper.INSTANCE.mapToUsers(usersDTO);
         Authentication authentication = 
                         authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(users.getUsername(), users.getPassword()));
         if(authentication.isAuthenticated()){
@@ -110,6 +122,19 @@ public class UsersService {
         } else {
             return "Fail";
         }
+    }
+
+    public void deleteUsers(Long id) {
+        Users user = usersRepository.findById(id)
+                    .orElseThrow(() -> new RuntimeException("User is not found according to the given Id"));
+        if(user.getRole().name().equals("EMPLOYEE")){
+            user.getEmployee().setUsers(null);
+            user.setEmployee(null);
+        } else if(user.getRole().name().equals("MANAGER")){
+            user.getManager().setUsers(null);
+            user.setManager(null);
+        }
+        usersRepository.delete(user);
     }
 
 }

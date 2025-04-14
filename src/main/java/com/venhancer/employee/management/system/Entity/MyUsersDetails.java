@@ -7,6 +7,8 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
+import com.venhancer.employee.management.system.Enumeration.Roles;
+
 public class MyUsersDetails implements UserDetails{
 
     private Users user;
@@ -33,6 +35,22 @@ public class MyUsersDetails implements UserDetails{
 
     public Long getId(){
         return user.getId();
+    }
+
+    public Long getEmployeeId(){
+        return user.getEmployee().getId();
+    }
+
+    public Long getManagerId(){
+        return user.getManager().getId();
+    }
+
+    public Long getDepartmentId(){
+        return user.getDepartmentId();
+    }
+
+    public Roles getRole(){
+        return user.getRole();
     }
 
     @Override

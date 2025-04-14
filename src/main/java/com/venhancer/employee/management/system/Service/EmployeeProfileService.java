@@ -1,12 +1,15 @@
 package com.venhancer.employee.management.system.Service;
 
+
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import com.venhancer.employee.management.system.DTO.EmployeeProfileDTO;
 import com.venhancer.employee.management.system.Entity.Employee;
 import com.venhancer.employee.management.system.Entity.EmployeeProfile;
+import com.venhancer.employee.management.system.Entity.MyUsersDetails;
 import com.venhancer.employee.management.system.Exception.ResourceNotFoundException;
 import com.venhancer.employee.management.system.Mapper.EmployeeProfileMapper;
 import com.venhancer.employee.management.system.Repository.EmployeeProfileRepository;
@@ -21,12 +24,19 @@ public class EmployeeProfileService {
     @Autowired
     EmployeeProfileRepository employeeProfileRepository;
 
-    @PreAuthorize("hasAuthority('ROLE_EMPLOYEE')")
     public EmployeeProfileDTO updateEmployeeProfileDTO(Long id, EmployeeProfileDTO employeeProfileDTO){
+        
+        Authentication authenticatedEmployee = SecurityContextHolder.getContext().getAuthentication();
+        MyUsersDetails userDetails = (MyUsersDetails) authenticatedEmployee.getPrincipal();
+        Long authenticatedEmployeeId = userDetails.getEmployeeId();
+        
+        if(!authenticatedEmployeeId.equals(id)){
+            throw new RuntimeException("You are not authorized to update this profile.");
+        }
+
         Employee employee = employeeRepository.findById(id)
                     .orElseThrow(() -> new ResourceNotFoundException("Employee is not found according to given ID"));
-        EmployeeProfile employeeProfile = employeeProfileRepository.findById(employee.getEmployeeProfile().getId())
-                    .orElseThrow(() -> new ResourceNotFoundException("Employee's profile is not found according to given ID"));
+        EmployeeProfile employeeProfile = employee.getEmployeeProfile();
         if(employeeProfileDTO.getName() != null){
             employeeProfile.setName(employeeProfileDTO.getName());
         }
@@ -47,10 +57,19 @@ public class EmployeeProfileService {
         return EmployeeProfileMapper.INSTANCE.mapToEmployeeProfileDTO(savedEmployeeProfile);
     }
 
-    @PreAuthorize("hasAuthority('ROLE_ADMIN') or hasAuthority('ROLE_MANAGER') or hasAuthority('ROLE_EMPLOYEE')")
     public EmployeeProfileDTO getEmployeeProfileById(Long id){
-        EmployeeProfile employeeProfile = employeeProfileRepository.findById(id)
-                    .orElseThrow(() -> new ResourceNotFoundException("Employee's profile is not found according to given ID"));
+        Authentication authenticatedEmployee = SecurityContextHolder.getContext().getAuthentication();
+        MyUsersDetails userDetails = (MyUsersDetails) authenticatedEmployee.getPrincipal();
+        
+        if(userDetails.getRole().name().equals("EMPLOYEE")){
+            if(!userDetails.getEmployeeId().equals(id)){
+                throw new RuntimeException("You are not authorized to see this profile.");
+            }
+        }
+
+        Employee employee = employeeRepository.findById(id)
+                    .orElseThrow(() -> new ResourceNotFoundException("Employee is not found according to given ID"));
+        EmployeeProfile employeeProfile = employee.getEmployeeProfile();
         return EmployeeProfileMapper.INSTANCE.mapToEmployeeProfileDTO(employeeProfile);
     }
 }

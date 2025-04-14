@@ -33,21 +33,22 @@ public class SecurityConfig {
 
         return httpSecurity.csrf(customizer -> customizer.disable())
                         .authorizeHttpRequests(request -> request
-                            .requestMatchers("/api/ems/employee/profile/update").hasAuthority("ROLE_EMPLOYEE")
+                            .requestMatchers("/api/ems/employee/profile/update/{id}").hasRole("EMPLOYEE")
                             .requestMatchers("/api/ems/department/create", 
-                                                         "/api/ems/department/delete",
+                                                         "/api/ems/department/delete/{id}",
                                                          "/api/ems/employee/create",
                                                          "/api/ems/employee/all",
-                                                         "/api/ems/employee/department-update",
-                                                         "/api/ems/employee/delete",
+                                                         "/api/ems/employee/department-update/{id}",
+                                                         "/api/ems/employee/delete/{id}",
                                                          "/api/ems/manager/create",
                                                          "/api/ems/manager/all",
-                                                         "/api/ems/manager/department-update",
-                                                         "/api/ems/manager/delete").hasAuthority("ROLE_ADMIN")
-                            .requestMatchers("/api/ems/manager/**").hasAnyAuthority("ROLE_ADMIN", "ROLE_MANAGER")
-                            .requestMatchers("/api/ems/employee/profile/**").hasAnyAuthority("ROLE_EMPLOYEE", "ROLE_ADMIN", "ROLE_MANAGER")
-                            .requestMatchers("/api/ems/employee/**").hasAnyAuthority("ROLE_ADMIN", "ROLE_MANAGER")
-                            .requestMatchers("/api/ems/department/**").hasAnyAuthority("ROLE_ADMIN", "ROLE_MANAGER")
+                                                         "/api/ems/manager/update/{id}",
+                                                         "/api/ems/manager/delete/{id}",
+                                                         "delete/{id}").hasRole("ADMIN")
+                            .requestMatchers("/api/ems/manager/**").hasAnyRole("ADMIN", "MANAGER")
+                            .requestMatchers("/api/ems/employee/profile/**").hasAnyRole("EMPLOYEE", "ADMIN", "MANAGER")
+                            .requestMatchers("/api/ems/employee/**").hasAnyRole("ADMIN", "MANAGER")
+                            .requestMatchers("/api/ems/department/**").hasAnyRole("ADMIN", "MANAGER")
                             .requestMatchers("register", "login").permitAll()
                             .anyRequest().authenticated())
                         .httpBasic(Customizer.withDefaults())
