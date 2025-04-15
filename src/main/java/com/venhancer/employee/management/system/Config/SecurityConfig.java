@@ -49,7 +49,7 @@ public class SecurityConfig {
                             .requestMatchers("/api/ems/employee/profile/**").hasAnyRole("EMPLOYEE", "ADMIN", "MANAGER")
                             .requestMatchers("/api/ems/employee/**").hasAnyRole("ADMIN", "MANAGER")
                             .requestMatchers("/api/ems/department/**").hasAnyRole("ADMIN", "MANAGER")
-                            .requestMatchers("register", "login").permitAll()
+                            .requestMatchers("register", "login", "/api/weather").permitAll()
                             .anyRequest().authenticated())
                         .httpBasic(Customizer.withDefaults())
                         .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
