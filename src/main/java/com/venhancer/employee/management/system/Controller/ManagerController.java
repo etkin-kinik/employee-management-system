@@ -5,6 +5,7 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
@@ -16,6 +17,8 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.venhancer.employee.management.system.DTO.ManagerDTO;
 import com.venhancer.employee.management.system.Service.ManagerService;
+import com.venhancer.employee.management.system.Validation.OnCreate;
+import com.venhancer.employee.management.system.Validation.OnUpdate;
 
 @RestController
 @RequestMapping("/api/ems/manager")
@@ -25,7 +28,7 @@ public class ManagerController {
     ManagerService managerService;
 
     @PostMapping("/create")
-    public ResponseEntity<ManagerDTO> createManager(@RequestBody ManagerDTO managerDTO){
+    public ResponseEntity<ManagerDTO> createManager(@Validated(OnCreate.class) @RequestBody ManagerDTO managerDTO){
         ManagerDTO createdManager = managerService.createManager(managerDTO);
         return new ResponseEntity<>(createdManager, HttpStatus.CREATED);
     }
@@ -48,8 +51,8 @@ public class ManagerController {
         return ResponseEntity.ok(manager);
     }
 
-    @PatchMapping("/update/{id}")
-    public ResponseEntity<ManagerDTO> updateManagerDepartment(@PathVariable Long id, @RequestBody ManagerDTO managerDTO){
+    @PatchMapping("/department-update/{id}")
+    public ResponseEntity<ManagerDTO> updateManagerDepartment(@PathVariable Long id, @Validated(OnUpdate.class) @RequestBody ManagerDTO managerDTO){
         ManagerDTO updatedManager = managerService.updateManagerDepartment(id, managerDTO);
         return ResponseEntity.ok(updatedManager);
     }

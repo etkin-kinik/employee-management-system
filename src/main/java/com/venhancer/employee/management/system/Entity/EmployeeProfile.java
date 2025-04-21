@@ -2,9 +2,11 @@ package com.venhancer.employee.management.system.Entity;
 
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
@@ -28,17 +30,14 @@ public class EmployeeProfile {
     private String surname;
     private String email;
     private String phoneNumber;
-    private String address;
-    private Long employeeId;
 
-    @OneToOne(mappedBy = "employeeProfile", cascade = CascadeType.ALL)
+    @OneToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "address_id")
+    private Address address;
+
+    @OneToOne(fetch = FetchType.LAZY, mappedBy = "employeeProfile", cascade = CascadeType.ALL)
     private Employee employee;
 
-    public EmployeeProfile(Employee employee){
-        this.employee = employee;
-        this.email = null;
-        this.phoneNumber = null;
-        this.address = null;
-    }
-
+    @OneToOne(fetch = FetchType.LAZY, mappedBy = "managerProfile", cascade = CascadeType.ALL)
+    private Manager manager;
 }

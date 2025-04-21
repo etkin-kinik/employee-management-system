@@ -20,5 +20,4 @@ public class Weather {
     public static class WeatherDescription{
         private String value;
     }
-
 }

@@ -7,7 +7,7 @@ import org.mapstruct.factory.Mappers;
 import com.venhancer.employee.management.system.DTO.EmployeeDTO;
 import com.venhancer.employee.management.system.Entity.Employee;
 
-@Mapper
+@Mapper(uses = EmployeeProfileMapper.class)
 public interface EmployeeMapper {
 
     EmployeeMapper INSTANCE = Mappers.getMapper(EmployeeMapper.class);

@@ -8,13 +8,17 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.venhancer.employee.management.system.DTO.ManagerDTO;
+import com.venhancer.employee.management.system.Entity.Address;
 import com.venhancer.employee.management.system.Entity.Department;
 import com.venhancer.employee.management.system.Entity.Employee;
+import com.venhancer.employee.management.system.Entity.EmployeeProfile;
 import com.venhancer.employee.management.system.Entity.Manager;
 import com.venhancer.employee.management.system.Entity.Users;
 import com.venhancer.employee.management.system.Exception.ResourceNotFoundException;
 import com.venhancer.employee.management.system.Mapper.ManagerMapper;
+import com.venhancer.employee.management.system.Repository.AddressRepository;
 import com.venhancer.employee.management.system.Repository.DepartmentRepository;
+import com.venhancer.employee.management.system.Repository.EmployeeProfileRepository;
 import com.venhancer.employee.management.system.Repository.EmployeeRepository;
 import com.venhancer.employee.management.system.Repository.ManagerRepository;
 import com.venhancer.employee.management.system.Repository.UsersRepository;
@@ -26,7 +30,13 @@ public class ManagerService {
     EmployeeRepository employeeRepository;
 
     @Autowired
+    EmployeeProfileRepository employeeProfileRepository;
+
+    @Autowired
     DepartmentRepository departmentRepository;
+
+    @Autowired
+    AddressRepository addressRepository;
 
     @Autowired
     ManagerRepository managerRepository;
@@ -57,6 +67,20 @@ public class ManagerService {
         }
 
         Manager savedManager = managerRepository.save(manager);
+
+        if(savedManager.getManagerProfile() != null){
+            EmployeeProfile managerProfile = manager.getManagerProfile();
+            managerProfile.setName(savedManager.getName());
+            managerProfile.setSurname(savedManager.getSurname());
+            if(manager.getManagerProfile().getAddress() == null){
+                manager.getManagerProfile().setAddress(new Address());
+            }
+            managerProfile = employeeProfileRepository.save(managerProfile);
+            manager.setManagerProfile(managerProfile);
+
+            savedManager = managerRepository.save(savedManager);
+        }
+
         return ManagerMapper.INSTANCE.mapToManagerDTO(savedManager);
     }
 

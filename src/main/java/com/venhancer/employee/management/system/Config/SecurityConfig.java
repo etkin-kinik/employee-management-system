@@ -33,7 +33,10 @@ public class SecurityConfig {
 
         return httpSecurity.csrf(customizer -> customizer.disable())
                         .authorizeHttpRequests(request -> request
-                            .requestMatchers("/api/ems/employee/profile/update/{id}").hasRole("EMPLOYEE")
+                            .requestMatchers("/api/ems/employee/profile/employee-update/{id}").hasRole("EMPLOYEE")
+                            .requestMatchers("/api/ems/employee/profile/manager/{id}").hasAnyRole("ADMIN", "MANAGER")
+                            .requestMatchers("/api/ems/employee/profile/manager-update/{id}").hasRole("MANAGER")
+                            .requestMatchers("/api/weather").hasAnyRole("EMPLOYEE", "MANAGER")
                             .requestMatchers("/api/ems/department/create", 
                                                          "/api/ems/department/delete/{id}",
                                                          "/api/ems/employee/create",
@@ -49,7 +52,7 @@ public class SecurityConfig {
                             .requestMatchers("/api/ems/employee/profile/**").hasAnyRole("EMPLOYEE", "ADMIN", "MANAGER")
                             .requestMatchers("/api/ems/employee/**").hasAnyRole("ADMIN", "MANAGER")
                             .requestMatchers("/api/ems/department/**").hasAnyRole("ADMIN", "MANAGER")
-                            .requestMatchers("register", "login", "/api/weather").permitAll()
+                            .requestMatchers("register", "login").permitAll()
                             .anyRequest().authenticated())
                         .httpBasic(Customizer.withDefaults())
                         .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))

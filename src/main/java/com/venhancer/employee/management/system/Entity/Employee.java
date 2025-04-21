@@ -2,6 +2,7 @@ package com.venhancer.employee.management.system.Entity;
 
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -41,7 +42,7 @@ public class Employee {
     @JoinColumn(name = "manager_id")
     private Manager manager;
 
-    @OneToOne(mappedBy = "employee")
+    @OneToOne(mappedBy = "employee", fetch = FetchType.LAZY)
     private Users users;
 
 }

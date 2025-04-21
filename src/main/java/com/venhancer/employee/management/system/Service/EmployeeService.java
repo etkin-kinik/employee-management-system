@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.venhancer.employee.management.system.DTO.EmployeeDTO;
+import com.venhancer.employee.management.system.Entity.Address;
 import com.venhancer.employee.management.system.Entity.Department;
 import com.venhancer.employee.management.system.Entity.Employee;
 import com.venhancer.employee.management.system.Entity.EmployeeProfile;
@@ -44,6 +45,7 @@ public class EmployeeService {
 
         Department department = departmentRepository.findById(employeeDTO.getDepartmentId())
                     .orElseThrow(() -> new ResourceNotFoundException("Department is not found according to given ID"));
+
         employee.setDepartment(department);
 
         if(department.getManager() != null){
@@ -63,7 +65,9 @@ public class EmployeeService {
             EmployeeProfile employeeProfile = employee.getEmployeeProfile();
             employeeProfile.setName(savedEmployee.getName());
             employeeProfile.setSurname(savedEmployee.getSurname());
-            employeeProfile.setEmployeeId(savedEmployee.getId());
+            if(employee.getEmployeeProfile().getAddress() == null){
+                employee.getEmployeeProfile().setAddress(new Address());
+            }
             employeeProfile = employeeProfileRepository.save(employeeProfile);
             employee.setEmployeeProfile(employeeProfile);
         }

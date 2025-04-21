@@ -1,5 +1,6 @@
 package com.venhancer.employee.management.system.DTO;
 
+
 import lombok.Getter;
 import lombok.Setter;
 
@@ -11,6 +12,6 @@ public class EmployeeProfileDTO {
     private String surname;
     private String email;
     private String phoneNumber;
-    private String address;
-    private Long employeeId;
+    private Long addressId;
+    private AddressDTO address;
 }

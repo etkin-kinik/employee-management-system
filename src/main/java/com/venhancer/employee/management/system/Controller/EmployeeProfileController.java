@@ -19,15 +19,27 @@ public class EmployeeProfileController {
     @Autowired
     EmployeeProfileService employeeProfileService;
 
-    @PatchMapping("/update/{id}")
+    @PatchMapping("/employee-update/{id}")
     public ResponseEntity<EmployeeProfileDTO> updatedEmployeeProfile(@PathVariable Long id, @RequestBody EmployeeProfileDTO employeeProfileDTO){
-        EmployeeProfileDTO employeeProfile= employeeProfileService.updateEmployeeProfileDTO(id, employeeProfileDTO);
+        EmployeeProfileDTO employeeProfile = employeeProfileService.updateEmployeeProfile(id, employeeProfileDTO);
         return ResponseEntity.ok(employeeProfile);
     }
 
-    @GetMapping("/{id}")
+    @PatchMapping("/manager-update/{id}")
+    public ResponseEntity<EmployeeProfileDTO> updatedManagerProfile(@PathVariable Long id, @RequestBody EmployeeProfileDTO managerProfileDTO){
+        EmployeeProfileDTO managerProfile = employeeProfileService.updateManagerProfile(id, managerProfileDTO);
+        return ResponseEntity.ok(managerProfile);
+    }
+
+    @GetMapping("/employee/{id}")
     public ResponseEntity<EmployeeProfileDTO> getEmployeeProfileById(@PathVariable Long id){
         EmployeeProfileDTO employeeProfile = employeeProfileService.getEmployeeProfileById(id);
         return ResponseEntity.ok(employeeProfile);
+    }
+
+    @GetMapping("/manager/{id}")
+    public ResponseEntity<EmployeeProfileDTO> getManagerProfileById(@PathVariable Long id){
+        EmployeeProfileDTO managerProfile = employeeProfileService.getManagerProfileById(id);
+        return ResponseEntity.ok(managerProfile);
     }
 }

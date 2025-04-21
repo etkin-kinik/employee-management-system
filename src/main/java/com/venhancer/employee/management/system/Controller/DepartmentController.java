@@ -5,6 +5,7 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -15,6 +16,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.venhancer.employee.management.system.DTO.DepartmentDTO;
 import com.venhancer.employee.management.system.Service.DepartmentService;
+import com.venhancer.employee.management.system.Validation.OnCreate;
 
 
 @RestController
@@ -25,7 +27,7 @@ public class DepartmentController {
     DepartmentService departmentService;
 
     @PostMapping("/create")
-    public ResponseEntity<DepartmentDTO> createDepartment(@RequestBody DepartmentDTO departmentDTO){
+    public ResponseEntity<DepartmentDTO> createDepartment(@Validated(OnCreate.class) @RequestBody DepartmentDTO departmentDTO){
         DepartmentDTO createdDepartment = departmentService.createDepartment(departmentDTO);
         return new ResponseEntity<>(createdDepartment, HttpStatus.CREATED);
     }

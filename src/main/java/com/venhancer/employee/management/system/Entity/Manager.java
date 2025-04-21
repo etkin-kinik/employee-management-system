@@ -4,6 +4,7 @@ import java.util.List;
 
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -39,6 +40,10 @@ public class Manager {
     @OneToMany(mappedBy = "manager", cascade = CascadeType.PERSIST)
     private List<Employee> employee;
 
-    @OneToOne(mappedBy = "manager")
+    @OneToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "profile_id")
+    private EmployeeProfile managerProfile;
+
+    @OneToOne(mappedBy = "manager", fetch = FetchType.LAZY)
     private Users users;
 }
